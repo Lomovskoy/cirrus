@@ -1,4 +1,4 @@
-package org.server.virtual.threads;
+package org.server.virtual.threads.app;
 
 public class Main {
     static void main() {
