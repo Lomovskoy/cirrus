@@ -1,6 +1,5 @@
 package org.server.virtual.threads.core.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Map;
@@ -29,6 +28,11 @@ public class HttpRequest {
         this(method, path, Map.of(), Map.of(), "");
     }
 
-    public String getParam(String name) { return params.get(name); }
-    public String getHeader(String name) { return headers.get(name.toLowerCase()); }
+    public String getParam(String name) {
+        return params.get(name);
+    }
+
+    public String getHeader(String name) {
+        return headers.get(name.toLowerCase());
+    }
 }
