@@ -1,5 +1,8 @@
 package org.server.virtual.threads.core.constants;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 public final class HttpConstants {
 
     private HttpConstants() {} // prohibit the creation of instances
@@ -43,7 +46,7 @@ public final class HttpConstants {
 
     // ========== Encodings ==========
     public static final String CHARSET_UTF_8 = "charset=utf-8";
-    public static final String US_ASCII = "US-ASCII";
+    public static final Charset US_ASCII = StandardCharsets.US_ASCII;
 
     // ========== Symbols ==========
     public static final String HTTP_VERSION_PREFIX = "HTTP/";

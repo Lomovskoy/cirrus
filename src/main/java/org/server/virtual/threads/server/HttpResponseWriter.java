@@ -16,8 +16,6 @@ import static org.server.virtual.threads.core.constants.HttpConstants.*;
  */
 public class HttpResponseWriter {
 
-    private static final Charset US_ASCII = StandardCharsets.US_ASCII;
-
     /**
      * Converts the HttpResponse to a byte array and writes it to the output stream.
      * First, collects the entire response in memory, then sends it.

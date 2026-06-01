@@ -46,7 +46,7 @@ public class HttpParser {
      */
     public HttpRequest parse(InputStream input) throws IOException {
 
-        var reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.US_ASCII), maxHeaderSize);
+        var reader = new BufferedReader(new InputStreamReader(input, US_ASCII), maxHeaderSize);
         var requestLine = readLineSafe(reader);
 
         if (requestLine.isEmpty()) {
