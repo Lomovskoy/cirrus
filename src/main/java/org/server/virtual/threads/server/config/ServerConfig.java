@@ -18,33 +18,48 @@ public class ServerConfig {
     public static final int DEFAULT_BACKLOG = 50000;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
 
-    private int port = DEFAULT_PORT;
-    private int maxHeaderSize = DEFAULT_MAX_HEADER_SIZE;
-    private int maxBodySize = DEFAULT_MAX_BODY_SIZE;
-    private int backlog = DEFAULT_BACKLOG;
-    private boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
+    @Builder.Default
+    private final int port = DEFAULT_PORT;
+    @Builder.Default
+    private final int maxHeaderSize = DEFAULT_MAX_HEADER_SIZE;
+    @Builder.Default
+    private final int maxBodySize = DEFAULT_MAX_BODY_SIZE;
+    @Builder.Default
+    private final int backlog = DEFAULT_BACKLOG;
+    @Builder.Default
+    private final boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
 
-    // Reading from System properties
-    public ServerConfig() {
-        String maxHeaderProp = System.getProperty("vts.max.header.size");
-        if (maxHeaderProp != null) {
-            try {
-                this.maxHeaderSize = Integer.parseInt(maxHeaderProp);
-            } catch (NumberFormatException ignored) {}
-        }
+    /**
+     * Creates a configuration from System properties (vts.port, vts.max.header.size, vts.max.body.size)
+     * If the property is not specified, default values are used.
+     */
+    public static ServerConfig fromSystemProperties() {
+        var builder = ServerConfig.builder();
 
-        String maxBodyProp = System.getProperty("vts.max.body.size");
-        if (maxBodyProp != null) {
-            try {
-                this.maxBodySize = Integer.parseInt(maxBodyProp);
-            } catch (NumberFormatException ignored) {}
-        }
-
-        String portProp = System.getProperty("vts.port");
+        var portProp = System.getProperty("vts.port");
         if (portProp != null) {
             try {
-                this.port = Integer.parseInt(portProp);
-            } catch (NumberFormatException ignored) {}
+                builder.port(Integer.parseInt(portProp));
+            } catch (NumberFormatException ignored) {
+            }
         }
+
+        var maxHeaderProp = System.getProperty("vts.max.header.size");
+        if (maxHeaderProp != null) {
+            try {
+                builder.maxHeaderSize(Integer.parseInt(maxHeaderProp));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        var maxBodyProp = System.getProperty("vts.max.body.size");
+        if (maxBodyProp != null) {
+            try {
+                builder.maxBodySize(Integer.parseInt(maxBodyProp));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        return builder.build();
     }
 }

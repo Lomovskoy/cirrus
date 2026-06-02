@@ -74,6 +74,7 @@ public final class HttpConstants {
     public static final String ERROR_INVALID_HTTP_VERSION = "Invalid HTTP version: %s";
     public static final String ERROR_INVALID_CONTENT_LENGTH = "Invalid Content-Length: %s";
     public static final String ERROR_BODY_TOO_LARGE = "Body too large: %d bytes (max %d bytes)";
+    public static final String ERROR_PREMATURE_EOF = "Premature EOF: expected %d bytes, got %d";
 
     private static final int CR_CHAR = CR;
     private static final int LF_CHAR = LF;

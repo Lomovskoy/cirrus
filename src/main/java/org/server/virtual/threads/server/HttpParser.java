@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class HttpParser {
     }
 
     public HttpParser() {
-        this(ServerConfig.builder().build());
+        this(ServerConfig.fromSystemProperties());
     }
 
     /**
@@ -71,21 +70,25 @@ public class HttpParser {
 
         int nextChar;
         while ((nextChar = reader.read()) != -1) {
-            charsRead++;
 
             if (charsRead > maxHeaderSize) {
                 throw new IOException(String.format(ERROR_HEADER_TOO_LARGE, maxHeaderSize));
             }
 
             char ch = (char) nextChar;
-            if (ch == LF) break;            // Line feed (\n) - end of current line
-            if (ch != CR) line.append(ch);  // Carriage return (\r) - ignore (skip)
+            if (ch == LF) break; // Line feed (\n) - end of current line
+
+            // Carriage return (\r) - ignore (skip)
+            if (ch != CR) {
+                line.append(ch);
+                charsRead++;
+            }
         }
         return line.toString();
     }
 
     private boolean isBlank(String str) {
-        return str == null || str.isEmpty();
+        return str.isEmpty();
     }
 
     /**
@@ -116,7 +119,7 @@ public class HttpParser {
         // (e.g., "HTTP/1.1"). Check that it starts with "HTTP/".
         if (parts.length > REQUEST_LINE_VERSION_INDEX) {
             var version = parts[REQUEST_LINE_VERSION_INDEX];
-            if (!version.startsWith(HTTP_VERSION_PREFIX)) {
+            if (!version.startsWith(HTTP_VERSION_PREFIX) || !version.equals(HTTP_1_0)) {
                 throw new IOException(String.format(ERROR_INVALID_HTTP_VERSION, version));
             }
         }
@@ -145,8 +148,8 @@ public class HttpParser {
         while (!isBlank(line = readLineSafe(reader))) {
             int colonIndex = line.indexOf(COLON);
             if (colonIndex > 0) {
-                String name = line.substring(0, colonIndex).trim().toLowerCase(Locale.ROOT);
-                String value = line.substring(colonIndex + 1).trim();
+                var name = line.substring(0, colonIndex).trim().toLowerCase(Locale.ROOT);
+                var value = line.substring(colonIndex + 1).trim();
                 headers.put(name, value);
             }
         }
@@ -158,7 +161,7 @@ public class HttpParser {
      * Returns an empty string if there is nobody.
      */
     private String parseBody(BufferedReader reader, Map<String, String> headers) throws IOException {
-        String contentLengthStr = headers.get(HEADER_CONTENT_LENGTH);
+        var contentLengthStr = headers.get(HEADER_CONTENT_LENGTH);
         if (contentLengthStr == null) {
             return EMPTY;   // no title → nobody
         }
@@ -189,7 +192,9 @@ public class HttpParser {
         int totalRead = 0;
         while (totalRead < length) {
             int read = reader.read(bodyChars, totalRead, length - totalRead);
-            if (read == -1) break; // The stream ended earlier than expected (client error)
+            if (read == -1) {
+                throw new IOException(String.format(ERROR_PREMATURE_EOF, length, totalRead));
+            }
             totalRead += read;
         }
         return new String(bodyChars, 0, totalRead);

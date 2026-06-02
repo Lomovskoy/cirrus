@@ -5,8 +5,6 @@ import org.server.virtual.threads.core.model.HttpResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import static org.server.virtual.threads.core.constants.HttpConstants.*;
 
@@ -50,19 +48,12 @@ public class HttpResponseWriter {
         // Important: headers must be written BEFORE the body.
         var headers = response.getHeaders();
 
-        // If the Content-Length header is missing, but the body is present, we add it automatically.
-        var hasContentLength = headers.containsKey(HEADER_CONTENT_LENGTH.toLowerCase());
         var body = response.getBody();
-        var hasBody = body != null && body.length > 0;
+        var hasBody = body.length > 0;
 
         // Write all the headers that are already in the response
         for (var entry : headers.entrySet()) {
             buffer.writeBytes((entry.getKey() + COLON_SPACE + entry.getValue() + CRLF).getBytes(US_ASCII));
-        }
-
-        // Add Content-Length if the body is present but the header is not set
-        if (hasBody && !hasContentLength) {
-            buffer.writeBytes((HEADER_CONTENT_LENGTH + COLON_SPACE + body.length + CRLF).getBytes(US_ASCII));
         }
 
         // An empty line separating the headings and body

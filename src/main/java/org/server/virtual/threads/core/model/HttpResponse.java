@@ -5,6 +5,10 @@ import lombok.Getter;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import static org.server.virtual.threads.core.constants.HttpConstants.HEADER_CONTENT_LENGTH;
+import static org.server.virtual.threads.core.constants.HttpConstants.HEADER_CONTENT_TYPE;
 
 /**
  * HTTP response. Mutable – built gradually.
@@ -28,6 +32,10 @@ public class HttpResponse {
 
     // header by name
     public HttpResponse header(String name, String value) {
+        if (name.equalsIgnoreCase(HEADER_CONTENT_LENGTH) && body.length > 0) {
+            throw new IllegalStateException("Cannot set Content-Length after body is set");
+        }
+
         if (value == null) {
             headers.remove(name.toLowerCase());
         } else {
@@ -36,24 +44,23 @@ public class HttpResponse {
         return this;
     }
 
-    public String header(String name) {
+    public String getHeader(String name) {
         return headers.get(name.toLowerCase());
     }
 
     // Content-Type enum
     public HttpResponse type(ContentType contentType) {
-        return header("Content-Type", contentType.getValue());
+        return header(HEADER_CONTENT_TYPE, contentType.getValue());
     }
 
     // Content-Type line (for custom)
     public HttpResponse type(String contentType) {
-        return header("Content-Type", contentType);
+        return header(HEADER_CONTENT_TYPE, contentType);
     }
 
-    // Тело
     public HttpResponse body(byte[] body) {
+        header(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
         this.body = body.clone();
-        header("Content-Length", String.valueOf(body.length));
         return this;
     }
 
