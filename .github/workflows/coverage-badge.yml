@@ -1,0 +1,10 @@
+- name: Grant execute permission for gradlew
+  run: chmod +x gradlew
+- name: Run tests and generate report
+  run: ./gradlew test jacocoTestReport
+- name: Generate coverage badge
+  uses: cicirello/jacoco-badge-generator@v2
+  with:
+    generate-branches-badge: true
+    jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+    github-token: ${{ secrets.GITHUB_TOKEN }}
