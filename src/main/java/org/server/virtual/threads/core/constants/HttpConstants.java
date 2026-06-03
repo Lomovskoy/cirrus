@@ -53,9 +53,9 @@ public final class HttpConstants {
     public static final char CR = '\r';
     public static final char LF = '\n';
     public static final String SPACE = " ";
-    public static final char COLON = ':';
+    public static final String COLON = ":";
     public static final char QUESTION_MARK = '?';
-    public static final char SLASH = '/';
+    public static final String SLASH = "/";
     public static final char DOT = '.';
     public static final char EQUALS = '=';
     public static final char AMPERSAND = '&';

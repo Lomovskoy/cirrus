@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.server.virtual.threads.core.constants.HttpConstants.EMPTY;
 
 
 class HttpParserTest {
@@ -100,11 +101,13 @@ class HttpParserTest {
     @Test
     @DisplayName("Headers are converted to lowercase and parsed correctly.")
     void headersAreNormalizedToLowerCase() throws IOException {
-        String rawRequest = "GET /test HTTP/1.0\r\n" +
-                "Content-Type: application/json\r\n" +
-                "X-Custom-Header: SomeValue\r\n" +
-                "Accept-Language: ru-RU\r\n" +
-                "\r\n";
+        String rawRequest = """
+                GET /test HTTP/1.0\r
+                Content-Type: application/json\r
+                X-Custom-Header: SomeValue\r
+                Accept-Language: ru-RU\r
+                \r
+                """;
 
         var parser = new HttpParser(TestServerConfig.withDefaultLimits());
         var request = parser.parse(toInputStream(rawRequest));
@@ -129,9 +132,11 @@ class HttpParserTest {
     @Test
     @DisplayName("Content-Length = 0 gives an empty body")
     void zeroContentLengthGivesEmptyBody() throws IOException {
-        var rawRequest = "POST /submit HTTP/1.0\r\n" +
-                "Content-Length: 0\r\n" +
-                "\r\n";
+        var rawRequest = """
+                POST /submit HTTP/1.0\r
+                Content-Length: 0\r
+                \r
+                """;
 
         var parser = new HttpParser(TestServerConfig.withDefaultLimits());
         var request = parser.parse(toInputStream(rawRequest));
@@ -144,10 +149,9 @@ class HttpParserTest {
     @Test
     @DisplayName("Empty request -> exception")
     void emptyRequestThrowsException() {
-        var rawRequest = "";
         var parser = new HttpParser(TestServerConfig.withDefaultLimits());
 
-        assertThatThrownBy(() -> parser.parse(toInputStream(rawRequest)))
+        assertThatThrownBy(() -> parser.parse(toInputStream(EMPTY)))
                 .isInstanceOf(IOException.class)
                 .hasMessage("Empty request");
     }
@@ -209,9 +213,11 @@ class HttpParserTest {
     @Test
     @DisplayName("Invalid Content-Length (not a number) -> exception")
     void invalidContentLengthThrowsException() {
-        var rawRequest = "POST /test HTTP/1.0\r\n" +
-                "Content-Length: abc\r\n" +
-                "\r\n";
+        var rawRequest = """
+                POST /test HTTP/1.0\r
+                Content-Length: abc\r
+                \r
+                """;
 
         var parser = new HttpParser(TestServerConfig.withDefaultLimits());
 
@@ -223,9 +229,11 @@ class HttpParserTest {
     @Test
     @DisplayName("Negative Content-Length -> body is not readable")
     void negativeContentLengthIgnored() throws IOException {
-        var rawRequest = "POST /test HTTP/1.0\r\n" +
-                "Content-Length: -10\r\n" +
-                "\r\n";
+        var rawRequest = """
+                POST /test HTTP/1.0\r
+                Content-Length: -10\r
+                \r
+                """;
 
         var parser = new HttpParser(TestServerConfig.withDefaultLimits());
         var request = parser.parse(toInputStream(rawRequest));
@@ -322,10 +330,12 @@ class HttpParserTest {
     @Test
     @DisplayName("Header without colon should be ignored")
     void headerWithoutColonIgnored() throws IOException {
-        var rawRequest = "GET /test HTTP/1.0\r\n" +
-                "InvalidHeader\r\n" +
-                "X-Valid: value\r\n" +
-                "\r\n";
+        var rawRequest = """
+                GET /test HTTP/1.0\r
+                InvalidHeader\r
+                X-Valid: value\r
+                \r
+                """;
 
         var parser = new HttpParser(TestServerConfig.withDefaultLimits());
         var request = parser.parse(toInputStream(rawRequest));
@@ -338,26 +348,29 @@ class HttpParserTest {
     @Test
     @DisplayName("Header with colon at position 0 should be ignored")
     void headerColonAtStartIgnored() throws IOException {
-        String rawRequest = "GET /test HTTP/1.0\r\n" +
-                ": value\r\n" +
-                "X-Valid: value2\r\n" +
-                "\r\n";
+        String rawRequest = """
+                GET /test HTTP/1.0\r
+                : value\r
+                X-Valid: value2\r
+                \r
+                """;
 
         var parser = new HttpParser(TestServerConfig.withDefaultLimits());
         var request = parser.parse(toInputStream(rawRequest));
 
         // The ":value" header should not be added
-        assertThat(request.getHeader("")).isNull();
+        assertThat(request.getHeader(EMPTY)).isNull();
         assertThat(request.getHeader("X-Valid")).isEqualTo("value2");
     }
 
     @Test
     @DisplayName("Should throw IOException when body is shorter than Content-Length")
     void bodyShorterThanContentLength() {
-        String rawRequest = "POST /test HTTP/1.0\r\n" +
-                "Content-Length: 100\r\n" +
-                "\r\n" +
-                "Short body"; // реальная длина 10 байт, а заголовок обещает 100
+        String rawRequest = """
+                POST /test HTTP/1.0\r
+                Content-Length: 100\r
+                \r
+                Short body"""; // реальная длина 10 байт, а заголовок обещает 100
 
         HttpParser parser = new HttpParser(TestServerConfig.withDefaultLimits());
 

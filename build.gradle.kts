@@ -17,7 +17,7 @@ repositories {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.assertj:assertj-core:3.27.3")
+    testImplementation("org.assertj:assertj-core:3.27.7")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
@@ -59,6 +59,8 @@ tasks.jacocoTestReport {
                 exclude("org/server/virtual/threads/server/config/**")
                 exclude("org/server/virtual/threads/core/constants/**")
                 exclude("org/server/virtual/threads/core/model/**")
+                exclude("org/server/virtual/threads/core/handler/**")
+                exclude("org/server/virtual/threads/core/router/Router.java")
             }
         }
     )
