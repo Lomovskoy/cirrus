@@ -17,6 +17,7 @@ public class ServerConfig {
     public static final int DEFAULT_MAX_BODY_SIZE = 10_485_760; // 10MB
     public static final int DEFAULT_BACKLOG = 50000;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
+    public static final int DEFAULT_SO_TIMEOUT = 0;
 
     @Builder.Default
     private final int port = DEFAULT_PORT;
@@ -28,6 +29,9 @@ public class ServerConfig {
     private final int backlog = DEFAULT_BACKLOG;
     @Builder.Default
     private final boolean tcpNoDelay = DEFAULT_TCP_NO_DELAY;
+    @Builder.Default
+    private int soTimeout = DEFAULT_SO_TIMEOUT; // 0 means infinite wait
+
 
     /**
      * Creates a configuration from System properties (vts.port, vts.max.header.size, vts.max.body.size)
