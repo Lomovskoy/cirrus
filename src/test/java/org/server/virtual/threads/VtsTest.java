@@ -27,7 +27,7 @@ class VtsTest {
     void createServerWithPort() throws Exception {
         int port = findFreePort();
         var server = Vts.createServer(port);
-        server.get("/test", (req, res) -> res.getText("OK"));
+        server.get("/test", (_, res) -> res.getText("OK"));
         startServerInThread(server);
 
         var response = sendRequest(port, "GET /test HTTP/1.0\r\n\r\n");
@@ -46,7 +46,7 @@ class VtsTest {
                 .maxHeaderSize(1024) // we don't check, but the configuration is applied
                 .build();
         var server = Vts.createServer(config);
-        server.get("/config", (req, res) -> res.getText("configured"));
+        server.get("/config", (_, res) -> res.getText("configured"));
         startServerInThread(server);
 
         var response = sendRequest(port, "GET /config HTTP/1.0\r\n\r\n");

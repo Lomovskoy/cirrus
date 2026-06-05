@@ -45,9 +45,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("GET /hello returns 200 and plain text")
     void getHello() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.get("/hello", (req, res) -> res.getText("Hello, World!"));
-        });
+        startServerWithRoutes(srv ->
+                srv.get("/hello", (_, res) -> res.getText("Hello, World!"))
+        );
 
         var response = sendRequest("GET /hello HTTP/1.0\r\n\r\n");
         assertThat(response).contains("HTTP/1.0 200 OK");
@@ -57,9 +57,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("POST /echo returns body with prefix")
     void postEcho() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.post("/echo", (req, res) -> res.getText("You said: " + req.getBody()));
-        });
+        startServerWithRoutes(srv ->
+                srv.post("/echo", (req, res) -> res.getText("You said: " + req.getBody()))
+        );
 
         var body = "Hello Server";
         var request = "POST /echo HTTP/1.0\r\n" +
@@ -76,9 +76,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("GET /users/:id extracts path parameter")
     void getUserById() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.get("/users/:id", (req, res) -> res.getText("User " + req.getParam("id")));
-        });
+        startServerWithRoutes(srv ->
+                srv.get("/users/:id", (req, res) -> res.getText("User " + req.getParam("id")))
+        );
 
         var response = sendRequest("GET /users/42 HTTP/1.0\r\n\r\n");
         assertThat(response).contains("HTTP/1.0 200 OK");
@@ -92,7 +92,7 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("Non‑existent route returns 404")
     void nonExistentRoute() throws Exception {
-        startServerWithRoutes(srv -> {}); // no routes
+        startServerWithRoutes(_ -> {}); // no routes
 
         var response = sendRequest("GET /unknown HTTP/1.0\r\n\r\n");
         assertThat(response).contains("HTTP/1.0 404 Not Found");
@@ -117,9 +117,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("Handler throwing exception should not crash server and sendError is called")
     void handlerThrowsException() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.get("/error", (req, res) -> { throw new RuntimeException("Test error"); });
-        });
+        startServerWithRoutes(srv ->
+                srv.get("/error", (_, _) -> { throw new RuntimeException("Test error"); })
+        );
 
         try (Socket socket = new Socket("localhost", port)) {
             socket.getOutputStream().write("GET /error HTTP/1.0\r\n\r\n".getBytes());
@@ -181,9 +181,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("Server stops gracefully and no longer accepts connections")
     void stopServer() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.get("/test", (_, res) -> res.getText("OK"));
-        });
+        startServerWithRoutes(srv ->
+                srv.get("/test", (_, res) -> res.getText("OK"))
+        );
 
         assertThat(canConnect()).isTrue();
 
@@ -207,7 +207,7 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("Stop twice should handle already closed socket")
     void stopTwice() throws Exception {
-        startServerWithRoutes(srv -> {});
+        startServerWithRoutes(_ -> {});
         int originalPort = server.getPort();
         server.stop(); // closes the socket for the first time
         server.stop(); // the second time - the socket is already closed
@@ -247,9 +247,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("PUT /resource returns 200")
     void putResource() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.put("/resource", (req, res) -> res.getText("PUT updated"));
-        });
+        startServerWithRoutes(srv ->
+                srv.put("/resource", (_, res) -> res.getText("PUT updated"))
+        );
 
         var response = sendRequest("PUT /resource HTTP/1.0\r\n\r\n");
         assertThat(response).contains("HTTP/1.0 200 OK");
@@ -259,9 +259,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("DELETE /resource returns 200")
     void deleteResource() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.delete("/resource", (req, res) -> res.getText("DELETE removed"));
-        });
+        startServerWithRoutes(srv ->
+                srv.delete("/resource", (_, res) -> res.getText("DELETE removed"))
+        );
 
         var response = sendRequest("DELETE /resource HTTP/1.0\r\n\r\n");
         assertThat(response).contains("HTTP/1.0 200 OK");
@@ -275,9 +275,9 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("Connection is closed after response")
     void connectionClosedAfterResponse() throws Exception {
-        startServerWithRoutes(srv -> {
-            srv.get("/close", (req, res) -> res.getText("bye"));
-        });
+        startServerWithRoutes(srv ->
+                srv.get("/close", (_, res) -> res.getText("bye"))
+        );
 
         try (var socket = new Socket("localhost", port)) {
             var out = socket.getOutputStream();
@@ -298,7 +298,7 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("Server survives malformed request without crashing")
     void serverSurvivesMalformedRequest() throws Exception {
-        startServerWithRoutes(srv -> {});
+        startServerWithRoutes(_ -> {});
         var malformed = "GET /any HTTP/1.0\r\nContent-Length: abc\r\n\r\n";
 
         // Just send and don't wait for a response; the server shouldn't crash
@@ -367,7 +367,7 @@ class VirtualThreadServerTest {
     }
 
     private boolean canConnect() {
-        try (var socket = new Socket("localhost", port)) {
+        try (var _ = new Socket("localhost", port)) {
             return true;
         } catch (IOException e) {
             return false;
