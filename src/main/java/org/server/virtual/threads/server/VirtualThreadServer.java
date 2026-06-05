@@ -70,7 +70,7 @@ public class VirtualThreadServer implements VtsServer {
 
         while (running.get()) {
             try {
-                Socket clientSocket = serverSocket.accept();
+                var clientSocket = serverSocket.accept();
                 clientSocket.setTcpNoDelay(config.isTcpNoDelay());
                 Thread.startVirtualThread(() -> handleClient(clientSocket));
             } catch (SocketTimeoutException e) {
@@ -90,15 +90,15 @@ public class VirtualThreadServer implements VtsServer {
             router.handle(request, response);
             writer.write(clientSocket.getOutputStream(), response);
         } catch (IOException e) {
-            sendError(clientSocket, HttpStatus.BAD_REQUEST, "400 Bad Request");
+            sendError(clientSocket, HttpStatus.BAD_REQUEST, String.format("%S %S", HttpStatus.BAD_REQUEST.getCode(), HttpStatus.BAD_REQUEST.getReason()));
         } catch (Exception e) {
-            sendError(clientSocket, HttpStatus.INTERNAL_ERROR, "500 Internal Server Error");
+            sendError(clientSocket, HttpStatus.INTERNAL_ERROR, String.format("%S %S", HttpStatus.INTERNAL_ERROR.getCode(), HttpStatus.INTERNAL_ERROR.getReason()));
         }
     }
 
     private void sendError(Socket socket, HttpStatus status, String message) {
         try {
-            HttpResponse errorResponse = new HttpResponse()
+            var errorResponse = new HttpResponse()
                     .status(status)
                     .getText(message);
             writer.write(socket.getOutputStream(), errorResponse);
