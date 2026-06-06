@@ -47,6 +47,23 @@ tasks.withType<JavaExec>().configureEach {
     jvmArgs("--enable-preview")
 }
 
+tasks.javadoc {
+    options.encoding = "UTF-8"
+    (options as StandardJavadocDocletOptions).apply {
+        addStringOption("Xdoclint:none", "-quiet")
+        links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+    }
+    include("com/vts/Vts.java")
+    include("com/vts/VtsServer.java")
+    include("com/vts/server/config/ServerConfig.java")
+}
+
+tasks.register("javadocJar", Jar::class) {
+    dependsOn(tasks.javadoc)
+    archiveClassifier.set("javadoc")
+    from(tasks.javadoc.get().destinationDir)
+}
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
