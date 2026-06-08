@@ -3,8 +3,8 @@ package org.server.virtual.threads.server;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.server.virtual.threads.Vts;
-import org.server.virtual.threads.VtsServer;
+import org.server.virtual.threads.Cirrus;
+import org.server.virtual.threads.CirrusServer;
 import org.server.virtual.threads.core.model.HttpStatus;
 import org.server.virtual.threads.core.router.TrieRouter;
 import org.server.virtual.threads.server.config.ServerConfig;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("VirtualThreadServer Integration Tests")
 class VirtualThreadServerTest {
 
-    private VtsServer server;
+    private CirrusServer server;
     private Thread serverThread;
     private int port;
 
@@ -102,7 +102,7 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("sendError handles write exception")
     void sendErrorHandlesWriteException() throws Exception {
-        var server = (VirtualThreadServer) Vts.createServer(0);
+        var server = (VirtualThreadServer) Cirrus.createServer(0);
         var mockSocket = mock(Socket.class);
         var badOut = mock(OutputStream.class);
         doThrow(new IOException("Write failed")).when(badOut).write(any(byte[].class));
@@ -134,7 +134,7 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("sendError uses writer.write and handles success")
     void sendErrorWriterWriteCoverage() throws Exception {
-        var server = (VirtualThreadServer) Vts.createServer(0);
+        var server = (VirtualThreadServer) Cirrus.createServer(0);
 
         // Create a mock Socket that returns a normal OutputStream
         var mockSocket = mock(Socket.class);
@@ -217,7 +217,7 @@ class VirtualThreadServerTest {
     @Test
     @DisplayName("Stop handles IOException when closing socket")
     void stopHandlesIOExceptionOnClose() throws Exception {
-        var server = (VirtualThreadServer) Vts.createServer(0);
+        var server = (VirtualThreadServer) Cirrus.createServer(0);
 
         // Create a mock ServerSocket
         var mockSocket = mock(ServerSocket.class);
@@ -316,7 +316,7 @@ class VirtualThreadServerTest {
 
     @FunctionalInterface
     private interface RouteRegistrar {
-        void register(VtsServer server);
+        void register(CirrusServer server);
     }
 
     private void startServerWithRoutes(RouteRegistrar registrar) throws Exception {
@@ -324,7 +324,7 @@ class VirtualThreadServerTest {
                 .port(0)          // random free port
                 .soTimeout(50)
                 .build();
-        server = Vts.createServer(config);
+        server = Cirrus.createServer(config);
         registrar.register(server);
 
         var startupError = new AtomicReference<Exception>();

@@ -1,6 +1,6 @@
 package org.server.virtual.threads.server;
 
-import org.server.virtual.threads.VtsServer;
+import org.server.virtual.threads.CirrusServer;
 import org.server.virtual.threads.core.handler.RouteHandler;
 import org.server.virtual.threads.core.model.HttpResponse;
 import org.server.virtual.threads.core.model.HttpStatus;
@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class VirtualThreadServer implements VtsServer {
+public class VirtualThreadServer implements CirrusServer {
     private static final Logger LOG = Logger.getLogger(VirtualThreadServer.class.getName());
 
     private final ServerConfig config;
@@ -35,25 +35,25 @@ public class VirtualThreadServer implements VtsServer {
     }
 
     @Override
-    public VtsServer get(String path, RouteHandler handler) {
+    public CirrusServer get(String path, RouteHandler handler) {
         router.get(path, handler);
         return this;
     }
 
     @Override
-    public VtsServer post(String path, RouteHandler handler) {
+    public CirrusServer post(String path, RouteHandler handler) {
         router.post(path, handler);
         return this;
     }
 
     @Override
-    public VtsServer put(String path, RouteHandler handler) {
+    public CirrusServer put(String path, RouteHandler handler) {
         router.put(path, handler);
         return this;
     }
 
     @Override
-    public VtsServer delete(String path, RouteHandler handler) {
+    public CirrusServer delete(String path, RouteHandler handler) {
         router.delete(path, handler);
         return this;
     }
@@ -66,7 +66,7 @@ public class VirtualThreadServer implements VtsServer {
         }
         this.actualPort = serverSocket.getLocalPort();
         running.set(true);
-        LOG.info("VTS HTTP/1.0 server started on port " + actualPort);
+        LOG.info("cirrus HTTP/1.0 server started on port " + actualPort);
 
         while (running.get()) {
             try {

@@ -12,21 +12,21 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@DisplayName("Vts facade tests")
-class VtsTest {
+@DisplayName("cirrus facade tests")
+class CirrusTest {
 
     @Test
-    @DisplayName("Cover default constructor of Vts")
+    @DisplayName("Cover default constructor of cirrus")
     void coverDefaultConstructor() {
-         var vts = new Vts();
-        assertThat(vts).isNotNull();
+         var cirrus = new Cirrus();
+        assertThat(cirrus).isNotNull();
     }
 
     @Test
     @DisplayName("createServer(port) should return a working server")
     void createServerWithPort() throws Exception {
         int port = findFreePort();
-        var server = Vts.createServer(port);
+        var server = Cirrus.createServer(port);
         server.get("/test", (_, res) -> res.getText("OK"));
         startServerInThread(server);
 
@@ -45,7 +45,7 @@ class VtsTest {
                 .port(port)
                 .maxHeaderSize(1024) // we don't check, but the configuration is applied
                 .build();
-        var server = Vts.createServer(config);
+        var server = Cirrus.createServer(config);
         server.get("/config", (_, res) -> res.getText("configured"));
         startServerInThread(server);
 
@@ -65,7 +65,7 @@ class VtsTest {
         }
     }
 
-    private void startServerInThread(VtsServer server) {
+    private void startServerInThread(CirrusServer server) {
         var t = new Thread(() -> {
             try {
                 server.start();

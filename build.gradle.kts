@@ -18,13 +18,16 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core:3.27.7")
-
     testImplementation("org.mockito:mockito-core:5.16.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.16.0")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     compileOnly("org.projectlombok:lombok:1.18.46")
+    compileOnly("org.springframework.boot:spring-boot-autoconfigure:3.4.0")
+    compileOnly("org.springframework:spring-webmvc:6.2.3")
+    compileOnly("jakarta.servlet:jakarta.servlet-api:6.1.0")
+
     annotationProcessor("org.projectlombok:lombok:1.18.46")
 }
 

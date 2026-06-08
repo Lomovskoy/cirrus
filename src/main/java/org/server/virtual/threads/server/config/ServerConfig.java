@@ -34,13 +34,13 @@ public class ServerConfig {
 
 
     /**
-     * Creates a configuration from System properties (vts.port, vts.max.header.size, vts.max.body.size)
+     * Creates a configuration from System properties (cirrus.port, cirrus.max.header.size, cirrus.max.body.size)
      * If the property is not specified, default values are used.
      */
     public static ServerConfig fromSystemProperties() {
         var builder = ServerConfig.builder();
 
-        var portProp = System.getProperty("vts.port");
+        var portProp = System.getProperty("cirrus.port");
         if (portProp != null) {
             try {
                 builder.port(Integer.parseInt(portProp));
@@ -48,7 +48,7 @@ public class ServerConfig {
             }
         }
 
-        var maxHeaderProp = System.getProperty("vts.max.header.size");
+        var maxHeaderProp = System.getProperty("cirrus.max.header.size");
         if (maxHeaderProp != null) {
             try {
                 builder.maxHeaderSize(Integer.parseInt(maxHeaderProp));
@@ -56,7 +56,7 @@ public class ServerConfig {
             }
         }
 
-        var maxBodyProp = System.getProperty("vts.max.body.size");
+        var maxBodyProp = System.getProperty("cirrus.max.body.size");
         if (maxBodyProp != null) {
             try {
                 builder.maxBodySize(Integer.parseInt(maxBodyProp));

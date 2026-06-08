@@ -29,8 +29,8 @@ class HttpParserConstructorTest {
     @Test
     @DisplayName("Default constructor uses system properties")
     void defaultConstructorUsesSystemProperties() {
-        System.setProperty("vts.max.header.size", "4096");
-        System.setProperty("vts.max.body.size", "2097152");
+        System.setProperty("cirrus.max.header.size", "4096");
+        System.setProperty("cirrus.max.body.size", "2097152");
 
         var parser = new HttpParser(); // this(ServerConfig.fromSystemProperties())
 
@@ -48,8 +48,8 @@ class HttpParserConstructorTest {
     @Test
     @DisplayName("Default constructor uses default limits when system properties absent")
     void defaultConstructorUsesDefaultLimits() {
-        System.clearProperty("vts.max.header.size");
-        System.clearProperty("vts.max.body.size");
+        System.clearProperty("cirrus.max.header.size");
+        System.clearProperty("cirrus.max.body.size");
 
         var parser = new HttpParser();
 
